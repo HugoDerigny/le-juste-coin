@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "223039102152",
+    "project_id": "le-juste-coin",
+    "storage_bucket": "le-juste-coin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223039102152:android:42253159d50362be4859fd",
+        "android_client_info": {
+          "package_name": "imt.hugoderigny.lejustecoin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223039102152-hu3a82s9mqcaet47hqjbccma1p0v1aus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdjHp23ssxxygPMwCYFixZ7MiyMuB7G4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223039102152-hu3a82s9mqcaet47hqjbccma1p0v1aus.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
