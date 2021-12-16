@@ -34,7 +34,7 @@ def ConvertFlaskImageToOpenCV(img_stream):
     return cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
 
-def ProcessImage(image, uuid, debug=False):
+def ProcessImage(image, uuid):
     resized = Resize(image, width=512)
 
     kernel = np.ones((6, 6), np.uint8)
@@ -44,21 +44,10 @@ def ProcessImage(image, uuid, debug=False):
     dilated = cv2.dilate(eroded, kernel, iterations=2)
     edges = cv2.Canny(dilated, 100, 200)
 
-    WriteTmpImage(blured, f'#{uuid}-blur')
-    WriteTmpImage(eroded, f'#{uuid}-erode')
-    WriteTmpImage(dilated, f'#{uuid}-dilate')
-    WriteTmpImage(edges, f'#{uuid}-canny')
-
-    Firebase.UploadImage(f'#{uuid}-blur')
-    Firebase.UploadImage(f'#{uuid}-erode')
-    Firebase.UploadImage(f'#{uuid}-dilate')
-    Firebase.UploadImage(f'#{uuid}-canny')
-
-    if not debug:
-        DeleteTmpImage(f'#{uuid}-blur')
-        DeleteTmpImage(f'#{uuid}-erode')
-        DeleteTmpImage(f'#{uuid}-dilate')
-        DeleteTmpImage(f'#{uuid}-canny')
+    Firebase.SaveImage(blured, f'#{uuid}-blur')
+    Firebase.SaveImage(eroded, f'#{uuid}-erode')
+    Firebase.SaveImage(dilated, f'#{uuid}-dilate')
+    Firebase.SaveImage(edges, f'#{uuid}-canny')
 
     return resized, edges
 

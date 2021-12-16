@@ -1,28 +1,33 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
-from src.controller.Analyzer import ProceedToAnalyse
+from src.controller.Analyzer import ProceedToAnalyse, FetchUserAnalyses
 
 app = Flask(__name__)
 
 # CNN.create_dataset()
 
-@app.route('/analyse', methods=['POST'])
+@app.route('/analyse', methods=['GET', 'POST'])
 def proceed_analyse():
     authorization = request.headers.get('Authorization')
-    image = request.files.get('image', '')
 
     if not authorization or authorization == '':
         return 'Authorization token not provided', 401
 
-    if not image:
-        return 'Image not provided', 400
+    if request.method == 'POST':
+        image = request.files.get('image', '')
 
-    json = ProceedToAnalyse(image, token=authorization, debug=request.args.get('debug') is not None)
+        if not image:
+            return 'Image not provided', 400
 
-    if not json:
-        return 'No coins found', 204
+        json = ProceedToAnalyse(image, token=authorization)
 
-    return json, 200
+        if not json:
+            return 'No coins found', 204
+
+        return json, 201
+
+    else:
+        return jsonify(FetchUserAnalyses(authorization)), 200
 
 
 if __name__ == '__main__':

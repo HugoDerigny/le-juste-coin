@@ -29,7 +29,7 @@ def CreateAnalyse(uuid, token):
         return True
 
     except Exception as e:
-        print(f'Erreur:', e)
+        print('Erreur:', e)
         return False
 
 
@@ -45,8 +45,25 @@ def AddItemsToAnalyse(uuid, index, cents, confidence):
         return True
 
     except Exception as e:
-        print(f'Erreur:', e)
+        print('Erreur:', e)
         return False
+
+def GetAnalysesOfUser(token=''):
+    (conn, cursor) = __getconn__()
+
+    try:
+        data = cursor.execute('SELECT id, created_at, "index" as item, cents, confidence FROM analyse a INNER JOIN analyse_item ai on a.id = ai.analyse_id WHERE user_id = ?', [token])
+
+        analyses = data.fetchall()
+
+        if analyses is None:
+            return []
+
+        return analyses
+
+    except Exception as e:
+        print('Erreur:', e)
+        return []
 
 # Renvoie un élève et ses notes de la BDD selon son nom.
 # def GetStudent(arg_name):

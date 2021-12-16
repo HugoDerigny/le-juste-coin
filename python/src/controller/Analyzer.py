@@ -1,10 +1,13 @@
 import json
 import locale
 import os
+from collections import defaultdict
 from uuid import uuid4
 
 import cv2
 
+import src.db.Database as Database
+import src.db.Firebase as Firebase
 import src.utils.AI as AI
 import src.utils.ImageUtils as ImageUtils
 
@@ -14,7 +17,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 models_dir_path = os.path.join(dir_path, '../..', 'models')
 
 
-def define_images(images):
+def DefineImages(images):
     for crop_img in images:
         cv2.imshow('Define', crop_img)
         cv2.waitKey(0)
@@ -36,14 +39,16 @@ def define_images(images):
         cv2.destroyAllWindows()
 
 
-def ProceedToAnalyse(image, token='', debug=False):
+def ProceedToAnalyse(image, token=''):
     image = ImageUtils.ConvertFlaskImageToOpenCV(image)
 
     uuid = (str(uuid4())[0:6]).upper()
 
-    (resized_image, blurred_image) = ImageUtils.ProcessImage(image, uuid, debug)
+    Firebase.SaveImage(image, f'#{uuid}-original')
 
-    result = AI.AnalyzeImage(resized_image, blurred_image, uuid, token, debug)
+    (resized_image, blurred_image) = ImageUtils.ProcessImage(image, uuid)
+
+    result = AI.AnalyzeImage(resized_image, blurred_image, uuid, token)
 
     if result is None:
         return
@@ -62,5 +67,48 @@ def ProceedToAnalyse(image, token='', debug=False):
 
     return json_data
 
+
 def FetchUserAnalyses(token):
-    return []
+    user_analyses_dto = Database.GetAnalysesOfUser(token)
+
+    user_analyses = []
+
+    d = defaultdict(list)
+
+    # Group analyses by UID
+    for (uid, *analyse_items) in user_analyses_dto:
+        d.setdefault(uid, []).append(analyse_items)
+
+    for (uid, analyse_items) in list(d.items()):
+        row = {}
+
+        confidences = []
+        sum_of_coins = 0
+
+        row = {
+            'id': f'#{uid}',
+            'items': [],
+            'average_confidence': 0,
+            'sum_of_coins': 0,
+            'created_at': 0
+        }
+
+        for (created_at, index, coin, confidence) in analyse_items:
+            confidences.append(confidence)
+            sum_of_coins += coin
+
+            row['created_at'] = created_at
+            row['items'].append({
+                'id': f'#{uid}-{index}',
+                'coin': coin,
+                'confidence': round(confidence)
+            })
+
+        average_confidence = round(sum(confidences) / len(confidences))
+
+        row['average_confidence'] = average_confidence
+        row['sum_of_coins'] = sum_of_coins
+
+        user_analyses.append(row)
+
+    return user_analyses
