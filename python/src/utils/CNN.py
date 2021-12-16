@@ -1,28 +1,33 @@
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing.image import img_to_array
+import os
+import pickle
+import random
+
+import cv2
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+from imutils import paths
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import img_to_array
+
 from src.utils.VGGNet import SmallerVGGNet
-from imutils import paths
-import numpy as np
-import matplotlib
-import imutils
-import random
-import pickle
-import cv2
-import os
 
 matplotlib.use("Agg")
 
-DATASET_PATH = os.path.join(os.getcwd(), 'models')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+ROOT_PATH = os.path.join(dir_path, '..', '..')
+DATASET_PATH = os.path.join(ROOT_PATH, 'models')
+TMP_PATH = os.path.join(ROOT_PATH, 'tmp')
 
 
 def create_dataset():
     # initialize the number of epochs to train for, initial learning rate, batch size, and image dimensions
     EPOCHS = 100
     INIT_LR = 0.001
-    BS = 16
+    BS = 32
     IMAGE_DIMS = (96, 96, 3)
 
     data = []
@@ -43,11 +48,9 @@ def create_dataset():
         data.append(image)
 
         coin_type = imagePath.split(os.path.sep)[-2]
-        coin_ref = imagePath.split(os.path.sep)[-1]
-        print(f'{coin_type}_{coin_ref}')
-        labels.append(f'{coin_type}_{coin_ref}')
-
-    print(len(data))
+        # coin_ref = imagePath.split(os.path.sep)[-1]
+        # labels.append(f'{coin_type}_{coin_ref}')
+        labels.append(coin_type)
 
     # scale the raw pixel intensities to the range [0, 1]
     data = np.array(data, dtype="float") / 255.0
@@ -83,33 +86,55 @@ def create_dataset():
 
     # save the results to disk
     print("[INFO] serializing network...")
-    model.save("dataset.h5")
+    model.save(os.path.join(ROOT_PATH, "dataset.h5"))
 
     print("[INFO] serializing label binarizer...")
-    f = open("lab.pickle", "wb")
+    f = open(os.path.join(ROOT_PATH, "lab.pickle"), "wb")
     f.write(pickle.dumps(lb))
     f.close()
+
+    # plot the training loss and accuracy
+    plt.style.use("ggplot")
+    plt.figure()
+    N = EPOCHS
+    plt.plot(np.arange(0, N), H.history["loss"], label="train_loss")
+    plt.plot(np.arange(0, N), H.history["val_loss"], label="val_loss")
+    plt.plot(np.arange(0, N), H.history["accuracy"], label="train_acc")
+    plt.plot(np.arange(0, N), H.history["val_accuracy"], label="val_acc")
+    plt.title("Training Loss and Accuracy")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss/Accuracy")
+    plt.legend(loc="upper left")
+    plt.savefig(TMP_PATH + '/train.png')
+    return
+
+
+values = {
+    "01": 200,
+    "02": 100,
+    "03": 50,
+    "04": 20,
+    "05": 10,
+    "06": 5
+}
 
 
 def classify(image, model, lb):
     output = image.copy()
 
-    # pre-process the image for classification
+    try:
+        image = cv2.resize(image, (96, 96))
+        image = image.astype("float") / 255.0
+        image = img_to_array(image)
+        image = np.expand_dims(image, axis=0)
 
-    image = cv2.resize(image, (96, 96))
-    image = image.astype("float") / 255.0
-    image = img_to_array(image)
-    image = np.expand_dims(image, axis=0)
+        proba = model.predict(image)[0]
+        idx = np.argmax(proba)
+        label = lb.classes_[idx]
 
-    # classify the input image
-    proba = model.predict(image)[0]
-    idx = np.argmax(proba)
-    label = lb.classes_[idx]
+        coin_value = values[label]
 
-    # build the label and draw the label on the image
-    label = "{}: {:.2f}%".format(label, proba[idx] * 100)
-    # label = "{}".format(label)
-    output = imutils.resize(output, width=400)
-    cv2.putText(output, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        return coin_value, proba[idx] * 100, output
 
-    return output, label, proba[idx] * 100
+    except Exception as e:
+        return None

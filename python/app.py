@@ -1,18 +1,28 @@
-from flask import Flask
+from flask import Flask, request
 
-import src.analyzer as Analyzer
-import src.utils.CNN as CNN
+from src.controller.Analyzer import ProceedToAnalyse
 
 app = Flask(__name__)
 
-# Analyzer.test()
-CNN.create_dataset()
+# CNN.create_dataset()
 
-@app.route('/')
-def ai_test():  # put application's code here
-    Analyzer.test()
+@app.route('/analyse', methods=['POST'])
+def proceed_analyse():
+    authorization = request.headers.get('Authorization')
+    image = request.files.get('image', '')
 
-    return 'OK'
+    if not authorization or authorization == '':
+        return 'Authorization token not provided', 401
+
+    if not image:
+        return 'Image not provided', 400
+
+    json = ProceedToAnalyse(image, token=authorization, debug=request.args.get('debug') is not None)
+
+    if not json:
+        return 'No coins found', 204
+
+    return json, 200
 
 
 if __name__ == '__main__':

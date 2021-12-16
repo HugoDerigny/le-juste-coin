@@ -1,10 +1,95 @@
 # le-juste-coin
 
-## Cas d'usage et roadmap
+## Cas d'usage de l'api
+
+### GET /analyse/:uid
+
+**Description**
+
+Renvoie les différentes analyses d'un utilisateurs.
+
+**Requête**
+
+- Headers
+
+```json
+{
+  "Authorization": <firebase_token>
+}
+```
+
+**Réponse**
+
+````json
+[
+  {
+    "id": "#123456",
+    "created_at": "2021-12-16 11:38:14.687588",
+    "items": {
+      "#123456-1": {
+        "cents": 50,
+        "confidence": 76
+      },
+      "#123456-2": {
+        "cents": 200,
+        "confidence": 54
+      }
+    },
+    "sum_of_coins": 250,
+    "average_confidence": 65
+  },
+  ...
+]
+````
+
+### POST /analyse
+
+**Description**
+
+Récupère l'image dans la requête, effectue l'analyse et renvoie un objet json:
+
+En parrallèle, les images sont enregistrées dans le Storage Firebase.
+
+**Requête**
+
+- Headers
+
+```json
+{
+  "Authorization": <firebase_token>,
+  "Content-Type": "multipart/form-data"
+}
+```
+
+- Body
+
+```json
+{
+  "image": <image_file>
+}
+```
+
+**Réponse**
+```json
+{
+  "items": {
+    "#123456-1": {
+      "cents": 50,
+      "confidence": 76
+    },
+    "#123456-2": {
+      "cents": 200,
+      "confidence": 54
+    }
+  },
+  "sum_of_coins": 250,
+  "average_confidence": 65
+}
+```
 
 1) L'utilisateur lance l'application et s'inscrit
 
-- [ ] Inscription dans Firebase
+- [x] Inscription dans Firebase
 - [ ] Récupération des images uploadées
 - [ ] Envoie du token d'authentification à l'API
 
