@@ -8,3 +8,6 @@
 /flutter/build
 /flutter/.dart_tool
 /flutter/.idea
+/flutter/.packages
+/flutter/.flutter-plugins
+/flutter/.flutter-plugins-dependencies
