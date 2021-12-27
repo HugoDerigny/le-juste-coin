@@ -1,9 +1,9 @@
 import 'package:camera/camera.dart';
-import 'package:combien_g/models/authentication.dart';
-import 'package:combien_g/pages/_app_router.dart';
-import 'package:combien_g/pages/sign_in.dart';
-import 'package:combien_g/utils/color_utils.dart';
-import 'package:combien_g/utils/font_utils.dart';
+import '../models/authentication.dart';
+import '../pages/_app_router.dart';
+import '../pages/sign_in.dart';
+import '../utils/color_utils.dart';
+import '../utils/font_utils.dart';
 import 'package:flutter/material.dart';
 
 class Register extends StatefulWidget {

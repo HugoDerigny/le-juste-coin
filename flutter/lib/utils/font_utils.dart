@@ -1,4 +1,4 @@
-import 'package:combien_g/utils/color_utils.dart';
+import '../utils/color_utils.dart';
 import 'package:flutter/material.dart';
 
 class FontUtils {

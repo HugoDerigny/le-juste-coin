@@ -1,13 +1,13 @@
 import 'package:camera/camera.dart';
-import 'package:combien_g/models/authentication.dart';
-import 'package:combien_g/pages/profile_page.dart';
-import 'package:combien_g/pages/sign_in.dart';
-import 'package:combien_g/pages/gallery.dart';
-import 'package:combien_g/utils/color_utils.dart';
+import '../models/authentication.dart';
+import '../pages/profile_page.dart';
+import '../pages/sign_in.dart';
+import '../pages/gallery.dart';
+import '../utils/color_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:combien_g/pages/take_picture.dart';
-import 'package:combien_g/pages/gallery.dart';
+import '../pages/take_picture.dart';
+import '../pages/gallery.dart';
 
 class AppRouter extends StatefulWidget {
   const AppRouter({Key? key, required this.camera}) : super(key: key);
@@ -31,7 +31,7 @@ class _AppRouterState extends State<AppRouter> {
   void initState() {
     super.initState();
 
-    _pagesWidget.insert(GALLERY_PAGE_INDEX, Gallery());
+    _pagesWidget.insert(GALLERY_PAGE_INDEX, const Gallery());
     _pagesWidget.insert(CAMERA_PAGE_INDEX, TakePicture(camera: widget.camera));
     _pagesWidget.insert(ACCOUNT_PAGE_INDEX, ProfilePage(camera: widget.camera));
   }
@@ -52,22 +52,26 @@ class _AppRouterState extends State<AppRouter> {
   Widget build(BuildContext context) {
     return Scaffold(
             body: SafeArea(
-              child: _pagesWidget.elementAt(_selectedIndex),
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: _pagesWidget,
+              )
             ),
             bottomNavigationBar: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_on),
-                  label: 'Galerie',
+              items: [
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.grid_view_rounded),
+                  label: 'Gallerie',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.camera,
-                    size: 30,
+                  icon: const Icon(
+                    Icons.filter_center_focus,
+                    size: 32,
                   ),
-                  label: 'Compter',
+                  backgroundColor: ColorUtils.gold,
+                  label: '',
                 ),
-                BottomNavigationBarItem(
+                const BottomNavigationBarItem(
                   icon: Icon(Icons.person),
                   label: 'Profil',
                 ),

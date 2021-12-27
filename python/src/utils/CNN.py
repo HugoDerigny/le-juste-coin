@@ -27,7 +27,7 @@ def create_dataset():
     # initialize the number of epochs to train for, initial learning rate, batch size, and image dimensions
     EPOCHS = 100
     INIT_LR = 0.001
-    BS = 32
+    BS = 128
     IMAGE_DIMS = (96, 96, 3)
 
     data = []
@@ -105,7 +105,7 @@ def create_dataset():
     plt.xlabel("Epoch #")
     plt.ylabel("Loss/Accuracy")
     plt.legend(loc="upper left")
-    plt.savefig(TMP_PATH + '/train.png')
+    plt.savefig(TMP_PATH + '/train_new_by_64.png')
     return
 
 

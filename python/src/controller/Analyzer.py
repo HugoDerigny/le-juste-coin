@@ -11,32 +11,32 @@ import src.db.Firebase as Firebase
 import src.utils.AI as AI
 import src.utils.ImageUtils as ImageUtils
 
-locale.setlocale(locale.LC_ALL, 'fr-FR')
+locale.setlocale(locale.LC_ALL, '')
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 models_dir_path = os.path.join(dir_path, '../..', 'models')
+data_dir_path = os.path.join(dir_path, '../..', 'data')
 
 
-def DefineImages(images):
-    for crop_img in images:
+def DefineImages(images, directory):
+    for image_name in images:
+        crop_img = cv2.imread(os.path.join(data_dir_path, directory, image_name))
         cv2.imshow('Define', crop_img)
         cv2.waitKey(0)
-        model = input('Enter corresponding value (01: 2€, 02: 1€, 03: 50cts, 04: 20cts, 05: 10cts, 06: 5cts, S: skip)')
 
-        if model.upper() == 'STOP':
-            cv2.destroyAllWindows()
-            break
+        while True:
+            side = input('P / F').upper()
 
-        if model.upper() == 'S':
-            cv2.destroyAllWindows()
-            continue
+            if ['P', 'F'].__contains__(side):
+                break
 
-        side = input('Pile (P) ou Face (F) ?')
-        id = str(len([name for name in os.listdir(os.path.join(models_dir_path, model)) if
+        id = str(len([name for name in os.listdir(os.path.join(models_dir_path, directory)) if
                       name[0] == side]) + 1)
-        id = id.zfill(6 - len(id))
-        cv2.imwrite(os.path.join(models_dir_path, model) + '/' + side + id + '.jpg', crop_img)
+        id = id.zfill(5)
+        cv2.imwrite(os.path.join(models_dir_path, directory) + '/' + side + id + '.jpg', crop_img)
         cv2.destroyAllWindows()
+
+        os.remove(os.path.join(data_dir_path, directory, image_name))
 
 
 def ProceedToAnalyse(image, token=''):

@@ -5,10 +5,15 @@ import numpy as np
 
 import src.db.Firebase as Firebase
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 
 def GetPathFromTmp(file):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(dir_path, '..', '..', 'tmp', file)
+
+
+def GetPathToData(coin_directory, file_name):
+    return os.path.join(dir_path, '..', '..', 'models', coin_directory, file_name)
 
 
 def ShowImage(image):
@@ -18,6 +23,10 @@ def ShowImage(image):
 
 def WriteTmpImage(img, name):
     cv2.imwrite(GetPathFromTmp(name + '.jpg'), img)
+    
+
+def WriteDataImage(image, directory, name):
+    cv2.imwrite(GetPathToData(directory, name + '.jpg'), image)
 
 
 def DeleteTmpImage(name):
