@@ -1,5 +1,5 @@
-import 'package:combien_g/utils/color_utils.dart';
-import 'package:combien_g/utils/font_utils.dart';
+import '../utils/color_utils.dart';
+import '../utils/font_utils.dart';
 import 'package:flutter/material.dart';
 
 class Tag extends StatelessWidget {

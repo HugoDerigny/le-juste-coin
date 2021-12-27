@@ -8,6 +8,7 @@ from keras.models import load_model
 import src.db.Database as Database
 import src.db.Firebase as Firebase
 from src.utils.CNN import classify
+from src.utils.ImageUtils import WriteTmpImage
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 ROOT_PATH = os.path.join(dir_path, '..', '..')

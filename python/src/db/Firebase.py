@@ -20,3 +20,9 @@ def SaveImage(image, name):
     blob.upload_from_filename(ImageUtils.GetPathFromTmp(filename))
 
     ImageUtils.DeleteTmpImage(name)
+
+
+def GetImage(image_name):
+    blob = bucket.get_blob(image_name)
+
+    return blob

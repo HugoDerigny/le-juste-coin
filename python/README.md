@@ -8,12 +8,12 @@ et stocker ceux-ci dans Firebase ainsi quand dans une BDD locale SQLite.
 ### Web serveur
 - [x] Envoyer une image pour analyse
 - [x] L'utilisateur récupère ses résultats
-- [ ] L'utilisateur effectue un retour sur un résultat pour indiquer s'il est correct. 
+- [x] L'utilisateur effectue un retour sur un résultat pour indiquer s'il est correct.
 
 ### Machine learning
-- [ ] *Remplir le dataset (40%...)*
+- [ ] *Remplir le dataset (90%...)*
 - [x] Créer le modèle
-- [ ] Gérer le retour utilisateur par rapport aux résultats d'une image
+- [x] Gérer le retour utilisateur par rapport aux résultats d'une image
 
 ### Gestion des images
 - [x] Traiter les images (transformations et détection des cercles)
