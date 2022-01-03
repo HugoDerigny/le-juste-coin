@@ -20,7 +20,7 @@ lb = pickle.loads(open(os.path.join(ROOT_PATH, "lab.pickle"), "rb").read())
 def ClassifyImages(images, uuid='', token=''):
     sum_of_coins = 0
     confidences = []
-    results = {}
+    results = []
 
     Database.CreateAnalyse(uuid, token)
 
@@ -36,10 +36,11 @@ def ClassifyImages(images, uuid='', token=''):
         Database.AddItemsToAnalyse(uuid, index + 1, coin, score)
         Firebase.SaveImage(image, image_uuid)
 
-        results[image_uuid] = {
-            'cents': coin,
+        results.append({
+            'id': image_uuid,
+            'coin': coin,
             'confidence': round(score)
-        }
+        })
 
         sum_of_coins += coin
         confidences.append(score)
@@ -66,7 +67,6 @@ def DetectCircles(img):
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 2, 30, param1=30, param2=60, minRadius=30, maxRadius=100)
 
     if circles is None:
-        print('warn - No circles detected')
         return []
 
     circles = np.uint16(np.around(circles))

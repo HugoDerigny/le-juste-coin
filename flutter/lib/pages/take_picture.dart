@@ -1,17 +1,18 @@
 import '../utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-
-import 'display_picture.dart';
+import './analyze_picture.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class TakePicture extends StatefulWidget {
+  final CameraDescription camera;
+  final Function setAnalyzes;
+
   const TakePicture({
     Key? key,
     required this.camera,
+    required this.setAnalyzes
   }) : super(key: key);
-
-  final CameraDescription camera;
 
   @override
   TakePictureState createState() => TakePictureState();
@@ -82,10 +83,11 @@ class TakePictureState extends State<TakePicture> {
 
             final image = await _controller.takePicture();
 
+            Navigator.pop(context);
             await Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  imagePath: image.path,
+                builder: (context) => AnalyzePicture(
+                  imagePath: image.path, setAnalyzes: widget.setAnalyzes
                 ),
               ),
             );

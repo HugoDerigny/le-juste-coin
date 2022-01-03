@@ -23,7 +23,7 @@ def ShowImage(image):
 
 def WriteTmpImage(img, name):
     cv2.imwrite(GetPathFromTmp(name + '.jpg'), img)
-    
+
 
 def WriteDataImage(image, directory, name):
     cv2.imwrite(GetPathToData(directory, name + '.jpg'), image)
@@ -43,7 +43,7 @@ def ConvertFlaskImageToOpenCV(img_stream):
     return cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
 
-def ProcessImage(image, uuid):
+def ProcessImage(image):
     resized = Resize(image, width=512)
 
     kernel = np.ones((6, 6), np.uint8)
@@ -53,12 +53,7 @@ def ProcessImage(image, uuid):
     dilated = cv2.dilate(eroded, kernel, iterations=2)
     edges = cv2.Canny(dilated, 100, 200)
 
-    Firebase.SaveImage(blured, f'#{uuid}-blur')
-    Firebase.SaveImage(eroded, f'#{uuid}-erode')
-    Firebase.SaveImage(dilated, f'#{uuid}-dilate')
-    Firebase.SaveImage(edges, f'#{uuid}-canny')
-
-    return resized, edges
+    return resized, blured, eroded, dilated, edges
 
 
 # Prend une image et redimensionne en gardant les dimensions

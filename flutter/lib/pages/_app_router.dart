@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:camera/camera.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:le_juste_coin/models/analyze.dart';
 import '../models/authentication.dart';
 import '../pages/profile_page.dart';
 import '../pages/sign_in.dart';
@@ -8,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../pages/take_picture.dart';
 import '../pages/gallery.dart';
+import 'package:http/http.dart' as http;
 
 class AppRouter extends StatefulWidget {
   const AppRouter({Key? key, required this.camera}) : super(key: key);
@@ -20,6 +26,7 @@ class AppRouter extends StatefulWidget {
 
 class _AppRouterState extends State<AppRouter> {
   int _selectedIndex = 0;
+  late Future<List<Analyze>> _analyses;
 
   final List<Widget> _pagesWidget = [];
 
@@ -27,12 +34,39 @@ class _AppRouterState extends State<AppRouter> {
   final int CAMERA_PAGE_INDEX = 1;
   final int ACCOUNT_PAGE_INDEX = 2;
 
+  Future<List<Analyze>> setUserAnalyzes() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    String analyzesEndpoint = dotenv.env['API_URL']! + '/analyse';
+
+    final response = await http.get(Uri.parse(analyzesEndpoint), headers: {'Authorization': auth.currentUser!.uid});
+
+    if (response.statusCode == 200) {
+      List<dynamic> analyzesDto = jsonDecode(response.body);
+
+      print('Fetched ' + analyzesDto.length.toString() + ' analyses');
+
+      return analyzesDto.map((analyzeDto) => Analyze.fromJson(analyzeDto)).toList();
+    } else {
+      throw Exception('Une erreur est survenue.');
+    }
+  }
+
+  void refreshAnalyzes() {
+    setState(() {
+      _analyses = setUserAnalyzes();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
 
-    _pagesWidget.insert(GALLERY_PAGE_INDEX, const Gallery());
-    _pagesWidget.insert(CAMERA_PAGE_INDEX, TakePicture(camera: widget.camera));
+    setState(() {
+      _analyses = setUserAnalyzes();
+    });
+
+    _pagesWidget.insert(GALLERY_PAGE_INDEX, Gallery(setAnalyzes: refreshAnalyzes, analyzes: _analyses));
+    _pagesWidget.insert(CAMERA_PAGE_INDEX, TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes));
     _pagesWidget.insert(ACCOUNT_PAGE_INDEX, ProfilePage(camera: widget.camera));
   }
 
@@ -50,6 +84,7 @@ class _AppRouterState extends State<AppRouter> {
 
   @override
   Widget build(BuildContext context) {
+    print('rendering');
     return Scaffold(
             body: SafeArea(
               child: IndexedStack(
@@ -60,7 +95,7 @@ class _AppRouterState extends State<AppRouter> {
             bottomNavigationBar: BottomNavigationBar(
               items: [
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_view_rounded),
+                  icon: Icon(Icons.grid_view_rounded, size: 20),
                   label: 'Gallerie',
                 ),
                 BottomNavigationBarItem(
@@ -69,10 +104,10 @@ class _AppRouterState extends State<AppRouter> {
                     size: 32,
                   ),
                   backgroundColor: ColorUtils.gold,
-                  label: '',
+                  label: 'Analyzer',
                 ),
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
+                  icon: Icon(Icons.person, size: 20),
                   label: 'Profil',
                 ),
               ],

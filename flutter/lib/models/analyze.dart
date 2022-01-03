@@ -25,7 +25,7 @@ class Analyze {
     ImageType.DILATED: 'dilate',
     ImageType.ERODED: 'erode',
     ImageType.CANNY: 'canny',
-    ImageType.CIRCLES: 'circles'
+    ImageType.CIRCLES: 'circles',
   };
 
   Analyze(this.id, this.createdAt, this.sumInCents, this.averageConfidence,
@@ -51,16 +51,16 @@ class Analyze {
   }
   
   Future<String> getImageUrl(ImageType imageType) async {
-    Reference ref = storage.ref().child('$id-$imageType.jpg');
-
+    Reference ref = storage.ref().child('$id-${images[imageType]}.jpg');
+  
     return await ref.getDownloadURL();
   }
   
-  Future<List<String>> getImagesInOrder() async {
-    List<String> imagesUrl = [];
+  Future<Map<String, String>> getImagesInOrder() async {
+    Map<String, String> imagesUrl = {};
 
     for (ImageType imagetype in ImageType.values) {
-      imagesUrl.add(await getImageUrl(imagetype));
+      imagesUrl[images[imagetype]!] = await getImageUrl(imagetype);
     }
 
     return imagesUrl;
@@ -70,6 +70,13 @@ class Analyze {
     NumberFormat formatter = NumberFormat("#,##0.00€", "fr_FR");
 
     return formatter.format(sumInCents / 100);
+  }
+
+  /**
+   * Transforme l'ID formaté #123456 en ID brut 123456.
+   */
+  String getOriginalId() {
+    return id.substring(1);
   }
 }
 
@@ -82,7 +89,7 @@ class AnalyzedItem {
 
   AnalyzedItem.fromJson(Map<String, dynamic> json)
     : id = json['id'],
-      cents = json['cents'],
+      cents = json['coin'],
       confidence = json['confidence'];
 
   Future<String> getImageUrl() async {

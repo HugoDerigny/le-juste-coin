@@ -10,7 +10,6 @@ certificate_path = os.path.join(dir_path, '..', '..', 'le-juste-coin-107107e80b4
 initialize_app(credentials.Certificate(certificate_path), {'storageBucket': 'le-juste-coin.appspot.com'})
 bucket = storage.bucket()
 
-
 def SaveImage(image, name):
     ImageUtils.WriteTmpImage(image, name)
 
@@ -26,3 +25,9 @@ def GetImage(image_name):
     blob = bucket.get_blob(image_name)
 
     return blob
+
+
+def RemoveImage(image_name):
+    bucket.delete_blob(image_name + '.jpg')
+
+    return True

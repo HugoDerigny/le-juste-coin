@@ -65,89 +65,46 @@ def GetAnalysesOfUser(token=''):
         print('Erreur:', e)
         return []
 
-# Renvoie un élève et ses notes de la BDD selon son nom.
-# def GetStudent(arg_name):
-#     (conn, cursor) = __getconn__()
-#
-#     """ FETCHING STUDENT """
-#
-#     data = cursor.execute('SELECT * FROM students WHERE name= ?', [arg_name])
-#     raw_student = data.fetchone()
-#
-#     if raw_student is None:
-#         print('[DB] No student found with name', arg_name)
-#         return None
-#
-#     print('[DB] Found students with name', arg_name, ':', raw_student)
-#
-#     (uuid, name, password, picture_name, addr, city) = raw_student
-#
-#     """ FETCHING STUDENT GRADES """
-#
-#     data = cursor.execute('SELECT * FROM grades WHERE user_id = ?', [uuid])
-#     raw_grades = data.fetchall()
-#
-#     grades = []
-#
-#     print('[DB] Grades for student :', raw_grades)
-#
-#     if raw_grades is not None:
-#         for (uuid, grade) in raw_grades:
-#             grades.append(Grade(uuid, grade))
-#
-#     conn.close()
-#
-#     return Student(uuid, name, addr, city, password, picture_name, grades)
-#
-#
-# # Supprime un élève en BDD selon son nom.
-# def DeleteStudent(arg_name):
-#     (conn, cursor) = __getconn__()
-#
-#     data = cursor.execute('DELETE FROM students WHERE name = ?', [arg_name])
-#
-#     print('[DB] Deleted student', arg_name)
-#
-#     conn.commit()
-#     conn.close()
-#
-#     return True
-#
-#
-# # Met à jour un élève en BDD selon son nom et avec les nouvelles valeurs du modèle passé en paramètre.
-# def UpdateStudent(arg_name, student):
-#     (conn, cursor) = __getconn__()
-#
-#     student_values = student.to_db()
-#     """ Removing uid """
-#     del student_values[0]
-#
-#     cursor.execute(
-#         'UPDATE students SET name = ?, password = ?, picture = ?, addr = ?, city = ? WHERE name = ?',
-#         [*student_values, arg_name])
-#
-#     print('[DB] Updated student', arg_name, 'with new values', student)
-#
-#     conn.commit()
-#     conn.close()
-#
-#     return GetStudent(student.name)
-#
-#
-# # Ajoute une note à un élève.
-# def AddGradeToStudent(arg_name, grade):
-#     (conn, cursor) = __getconn__()
-#
-#     student = GetStudent(arg_name)
-#
-#     if student is None:
-#         return False
-#
-#     cursor.execute('INSERT INTO grades VALUES (?, ?)', [student.uuid, int(grade)])
-#
-#     print('[DB] Created grade', grade, 'for', student.name)
-#
-#     conn.commit()
-#     conn.close()
-#
-#     return True
+
+def UserOwnAnalyze(user_id, analyze_id):
+    (conn, cursor) = __getconn__()
+
+    try:
+        data = cursor.execute('SELECT id FROM analyse WHERE id = ? AND user_id = ?', [analyze_id, user_id])
+
+        row_count = len(data.fetchall())
+
+        return row_count > 0
+
+    except Exception:
+        return False
+
+
+def GetAnalyzeById(id):
+    (conn, cursor) = __getconn__()
+
+    try:
+        data = cursor.execute('SELECT id, created_at, "index" as item, cents, confidence FROM analyse a INNER JOIN analyse_item ai on a.id = ai.analyse_id WHERE a.id = ?', [id])
+
+        return data.fetchone()
+
+    except Exception as e:
+        print('Erreur:', e)
+        return None
+
+
+def RemoveUserAnalyse(id):
+    (conn, cursor) = __getconn__()
+
+    try:
+        cursor.execute('DELETE FROM analyse_item WHERE analyse_id = ?', [id])
+        cursor.execute('DELETE FROM analyse WHERE id = ?', [id])
+
+        conn.commit()
+        conn.close()
+
+        return True
+
+    except Exception as e:
+        print('Erreur:', e)
+        return False
