@@ -19,7 +19,7 @@ app = Flask(__name__)
 # update_data()
 
 
-# CNN.create_dataset()
+CNN.create_dataset()
 
 def VerifyAuthToken():
     authorization = request.headers.get('Authorization')
@@ -87,4 +87,4 @@ def save_feedback():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='172.20.10.2')

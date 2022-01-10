@@ -43,8 +43,8 @@ class TakePictureState extends State<TakePicture> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorUtils.blue,
-        title: Text('Effectuer une analyse'),
+        title: Text('Compter mes pièces'),
+        backgroundColor: ColorUtils.pureBlack,
       ),
       body: Stack(alignment: FractionalOffset.center, children: [
         FutureBuilder<void>(

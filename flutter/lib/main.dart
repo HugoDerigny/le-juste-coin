@@ -15,11 +15,7 @@ Future<void> main() async {
   final cameras = await availableCameras();
   final firstCamera = cameras.first;
 
-  runApp(
-      App(
-      camera: firstCamera
-    )
-  );
+  runApp(App(camera: firstCamera));
 }
 
 class App extends StatefulWidget {
@@ -45,29 +41,27 @@ class _AppState extends State<App> {
         // Check for errors
         if (snapshot.hasError) {
           return MaterialApp(
+              debugShowCheckedModeBanner: false,
               home: Center(
-                child: Text(snapshot.error.toString(), style: FontUtils.contentDanger),
-              )
-          );
+                child: Text(snapshot.error.toString(),
+                    style: FontUtils.contentDanger),
+              ));
         }
 
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
-              home: SignIn(
-                camera: widget.camera
-              )
-          );
+              debugShowCheckedModeBanner: false,
+              home: SignIn(camera: widget.camera));
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
         return MaterialApp(
-          home: Center(
-            child: Text('Loading...', style: FontUtils.title),
-          )
-        );
+            debugShowCheckedModeBanner: false,
+            home: Center(
+              child: Text('Loading...', style: FontUtils.title),
+            ));
       },
     );
   }
 }
-

@@ -123,15 +123,16 @@ def DeleteUserAnalyze(user_id, analyze_id):
         return 'Not enough permission', 403
 
     analyze_dto = Database.GetAnalyzeById(analyze_id)
-    analyze = (__parseanalyzes__([analyze_dto]))[0]
+    analyze = __parseanalyzes__(analyze_dto)[0]
 
     Firebase.RemoveImage(f'#{analyze_id}-original')
     Firebase.RemoveImage(f'#{analyze_id}-blur')
     Firebase.RemoveImage(f'#{analyze_id}-erode')
     Firebase.RemoveImage(f'#{analyze_id}-dilate')
     Firebase.RemoveImage(f'#{analyze_id}-canny')
+    Firebase.RemoveImage(f'#{analyze_id}-circles')
 
     for item in analyze['items']:
-        Firebase.RemoveImage(f'#{item["id"]}')
+        Firebase.RemoveImage(f'{item["id"]}')
 
     Database.RemoveUserAnalyse(analyze_id)

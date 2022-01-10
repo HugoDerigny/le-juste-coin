@@ -18,8 +18,8 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController(text: 'hugo.derigny@free.fr');
+  TextEditingController passwordController = TextEditingController(text: 'azertyui');
 
   void loginUser(BuildContext context) async {
     var authResponse = await Authentication.signInUsingEmailPassword(
@@ -55,6 +55,7 @@ class _SignInState extends State<SignIn> {
                                 }
                                 return null;
                               },
+                              autocorrect: false,
                               controller: emailController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Adresse mail'),
                             ),
@@ -67,6 +68,7 @@ class _SignInState extends State<SignIn> {
                                 }
                                 return null;
                               },
+                              autocorrect: false,
                               controller: passwordController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Mot de passe'),
                               //validatePassword,        //Function to check validation

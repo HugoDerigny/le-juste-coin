@@ -10,6 +10,8 @@ enum ImageType {
   CIRCLES
 }
 
+enum CoinValue { TWO_EUROS, ONE_EURO, FIFTY_CENT, TWENTY_CENT, TEN_CENT, FIVE_CENT }
+
 var storage = FirebaseStorage.instance;
 
 class Analyze {
@@ -72,9 +74,7 @@ class Analyze {
     return formatter.format(sumInCents / 100);
   }
 
-  /**
-   * Transforme l'ID formaté #123456 en ID brut 123456.
-   */
+  /// Transforme l'ID formaté #123456 en ID brut 123456.
   String getOriginalId() {
     return id.substring(1);
   }

@@ -12,7 +12,7 @@
     }
 ]
 """
-from src.utils.ImageUtils import WriteDataImage
+from src.utils.ImageUtils import WriteDataImage, GetPathToData
 import src.db.Firebase as Firebase
 import json
 import os
@@ -43,9 +43,11 @@ def SaveFeedbackForAnalyse(feedback):
         coin_side = SIDES_MAP[item['side']]
 
         data_file_name = GetUniqueNameForNewFile(save_directory, coin_side)
-        file = Firebase.GetImage(firebase_file_id)
 
-        WriteDataImage(file, save_directory, data_file_name)
+        print(item, save_directory, data_file_name)
+
+        file_path = GetPathToData(save_directory, data_file_name)
+        Firebase.DownloadImage(firebase_file_id, file_path)
 
     return True
 
@@ -57,6 +59,6 @@ def GetUniqueNameForNewFile(save_directory, coin_side):
     directory_files = os.listdir(data_directory_path)
 
     next_file_name = str(len([name for name in directory_files if name[0] == coin_side]) + 1)
-    next_file_name = next_file_name.zfill(6)
+    next_file_name = next_file_name.zfill(5)
 
     return coin_side + next_file_name + '.jpg'

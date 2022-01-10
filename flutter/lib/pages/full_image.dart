@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:le_juste_coin/utils/color_utils.dart';
 
 class FullImage extends StatelessWidget {
-  const FullImage({Key? key, this.title = '', required this.imagePath}) : super(key: key);
+  const FullImage({Key? key, this.title = '', required this.imagePath})
+      : super(key: key);
 
   final String title;
   final String imagePath;
@@ -14,20 +15,36 @@ class FullImage extends StatelessWidget {
     bool _isUrl = Uri.parse(imagePath).isAbsolute;
 
     return Scaffold(
+      backgroundColor: ColorUtils.pureBlack,
       appBar: AppBar(
-        backgroundColor: ColorUtils.blue,
-        title: Text(title),
+        backgroundColor: ColorUtils.pureBlack,
+        title: Text(title, style: TextStyle(color: ColorUtils.white)),
       ),
       body: GestureDetector(
         onTap: () {
           Navigator.pop(context);
         },
         child: Center(
-          child: Hero(
-            tag: 'imageHero',
-            child: _isUrl ? Image.network(imagePath) : Image.file(File(imagePath))
-          ),
-        ),
+            child: InteractiveViewer(
+                panEnabled: false,
+                boundaryMargin: EdgeInsets.all(100),
+                minScale: 0.25,
+                maxScale: 2.5,
+                child: _isUrl
+                    ? Image.network(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                      )
+                    : Image.file(
+                        File(imagePath),
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                      ))),
       ),
     );
   }

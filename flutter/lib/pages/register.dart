@@ -68,6 +68,7 @@ class _RegisterState extends State<Register> {
                                 }
                                 return null;
                               },
+                              autocorrect: false,
                               controller: emailController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Adresse mail'),
                             ),
@@ -80,6 +81,7 @@ class _RegisterState extends State<Register> {
                                 }
                                 return null;
                               },
+                              autocorrect: false,
                               controller: passwordController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Mot de passe'),
                               //validatePassword,        //Function to check validation

@@ -1,9 +1,7 @@
+import base64
 import os
-
 import cv2
 import numpy as np
-
-import src.db.Firebase as Firebase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,8 +23,10 @@ def WriteTmpImage(img, name):
     cv2.imwrite(GetPathFromTmp(name + '.jpg'), img)
 
 
-def WriteDataImage(image, directory, name):
-    cv2.imwrite(GetPathToData(directory, name + '.jpg'), image)
+def WriteDataImage(blob, directory, name):
+    print(blob)
+    with open(GetPathToData(directory, name + '.jpg'), 'wb') as image:
+        image.write(base64.b64encode(blob))
 
 
 def DeleteTmpImage(name):

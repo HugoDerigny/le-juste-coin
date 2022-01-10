@@ -30,9 +30,9 @@ class _AppRouterState extends State<AppRouter> {
 
   final List<Widget> _pagesWidget = [];
 
-  final int GALLERY_PAGE_INDEX = 0;
-  final int CAMERA_PAGE_INDEX = 1;
-  final int ACCOUNT_PAGE_INDEX = 2;
+  static const GALLERY_PAGE_INDEX = 0;
+  static const CAMERA_PAGE_INDEX = 1;
+  static const ACCOUNT_PAGE_INDEX = 2;
 
   Future<List<Analyze>> setUserAnalyzes() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -42,8 +42,6 @@ class _AppRouterState extends State<AppRouter> {
 
     if (response.statusCode == 200) {
       List<dynamic> analyzesDto = jsonDecode(response.body);
-
-      print('Fetched ' + analyzesDto.length.toString() + ' analyses');
 
       return analyzesDto.map((analyzeDto) => Analyze.fromJson(analyzeDto)).toList();
     } else {
@@ -84,13 +82,23 @@ class _AppRouterState extends State<AppRouter> {
 
   @override
   Widget build(BuildContext context) {
-    print('rendering');
     return Scaffold(
             body: SafeArea(
-              child: IndexedStack(
-                index: _selectedIndex,
-                children: _pagesWidget,
-              )
+              child: (() {
+                switch(_selectedIndex) {
+                  case GALLERY_PAGE_INDEX:
+                    return Gallery(setAnalyzes: refreshAnalyzes, analyzes: _analyses);
+
+                  case CAMERA_PAGE_INDEX:
+                    return TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes);
+
+                  case ACCOUNT_PAGE_INDEX:
+                    return ProfilePage(camera: widget.camera);
+
+                  default:
+                    return TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes);
+                }
+              })()
             ),
             bottomNavigationBar: BottomNavigationBar(
               items: [

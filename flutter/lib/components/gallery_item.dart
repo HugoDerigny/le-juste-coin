@@ -10,13 +10,12 @@ class GalleryItem extends StatelessWidget {
   final Function refreshAnalyses;
   final Analyze analyze;
 
-  const GalleryItem({Key? key, required this.analyze, required this.refreshAnalyses}) : super(key: key);
+  GalleryItem({Key? key, required this.analyze, required this.refreshAnalyses}) : super(key: key);
 
   void openItem(BuildContext context) {
-    showModalBottomSheet<dynamic>(
+    showModalBottomSheet(
         context: context,
         isScrollControlled: true,
-        // backgroundColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
         ),

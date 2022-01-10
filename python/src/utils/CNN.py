@@ -1,7 +1,6 @@
 import os
 import pickle
 import random
-
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
@@ -25,9 +24,9 @@ TMP_PATH = os.path.join(ROOT_PATH, 'tmp')
 
 def create_dataset():
     # initialize the number of epochs to train for, initial learning rate, batch size, and image dimensions
-    EPOCHS = 100
+    EPOCHS = 250
     INIT_LR = 0.001
-    BS = 128
+    BS = 16
     IMAGE_DIMS = (96, 96, 3)
 
     data = []
@@ -86,10 +85,10 @@ def create_dataset():
 
     # save the results to disk
     print("[INFO] serializing network...")
-    model.save(os.path.join(ROOT_PATH, "dataset.h5"))
+    model.save(os.path.join(ROOT_PATH, "dataset_5k.h5"))
 
     print("[INFO] serializing label binarizer...")
-    f = open(os.path.join(ROOT_PATH, "lab.pickle"), "wb")
+    f = open(os.path.join(ROOT_PATH, "lab_5k.pickle"), "wb")
     f.write(pickle.dumps(lb))
     f.close()
 

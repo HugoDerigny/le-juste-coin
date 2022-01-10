@@ -3,7 +3,6 @@ import os
 import sqlite3
 
 
-# Connexion à la BDD incluse dans le projet et renvoie celle-ci
 def __getconn__():
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -13,8 +12,6 @@ def __getconn__():
     return conn, cursor
 
 
-# AJoute un élève en BDD selon son modèle.
-# Vérification qu'il n'y a pas de doublon de prénom.
 def CreateAnalyse(uuid, token):
     (conn, cursor) = __getconn__()
 
@@ -52,7 +49,7 @@ def GetAnalysesOfUser(token=''):
     (conn, cursor) = __getconn__()
 
     try:
-        data = cursor.execute('SELECT id, created_at, "index" as item, cents, confidence FROM analyse a INNER JOIN analyse_item ai on a.id = ai.analyse_id WHERE user_id = ?', [token])
+        data = cursor.execute('SELECT id, created_at, "index" as item, cents, confidence FROM analyse a INNER JOIN analyse_item ai on a.id = ai.analyse_id WHERE user_id = ? ORDER BY a.created_at DESC', [token])
 
         analyses = data.fetchall()
 
@@ -86,7 +83,7 @@ def GetAnalyzeById(id):
     try:
         data = cursor.execute('SELECT id, created_at, "index" as item, cents, confidence FROM analyse a INNER JOIN analyse_item ai on a.id = ai.analyse_id WHERE a.id = ?', [id])
 
-        return data.fetchone()
+        return data.fetchall()
 
     except Exception as e:
         print('Erreur:', e)

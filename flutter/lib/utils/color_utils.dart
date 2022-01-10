@@ -5,6 +5,7 @@ class ColorUtils {
   static Color gray = Color(0xFFE5E7EB);
   static Color darkGray = Color(0xFF6B7280);
   static Color black = Color(0xFF111827);
+  static Color pureBlack = Color(0xFF000000);
 
   static Color blue = Color(0xFF14213D);
   static Color gold = Color(0xFFFCA311);
