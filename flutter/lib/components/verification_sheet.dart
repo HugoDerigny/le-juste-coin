@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +19,17 @@ class VerificationSheet extends StatefulWidget {
   _VerificationSheetState createState() => _VerificationSheetState();
 }
 
+/// Fenêtre modale de vérification d'une analyse.
+/// Elle apparaît lorsqu'un utilisateur vient d'effectuer une analyse et qu'il
+/// tape sur le bouton "Vérifier". Cela vient du fichier [analyze_picture.dart]
 class _VerificationSheetState extends State<VerificationSheet> {
   int _verifyPageIndex = 0;
   List<Verification> _verifiedCoins = [];
   String _errorMessage = "";
   bool _loading = false;
 
+  /// A l'initialisation, on transforme le détail des analyses en notre modèle
+  /// de vérification.
   @override
   void initState() {
     super.initState();
@@ -33,11 +37,14 @@ class _VerificationSheetState extends State<VerificationSheet> {
     setState(() {
       _verifiedCoins = widget.analyze.items
           .map((AnalyzedItem item) =>
-              Verification(item.id, CoinSide.REVERSE, item.cents))
+              Verification(item.id, CoinSide.reverse, item.cents))
           .toList();
     });
   }
 
+  /// Envoie une requête à l'API pour effectuer la vérification.
+  /// S'il y a succès la fenêtre se ferme.
+  /// Sinon un message d'erreur apparaît.
   void sendForCorrection(BuildContext context) async {
     setState(() {
       _loading = true;
@@ -55,7 +62,7 @@ class _VerificationSheetState extends State<VerificationSheet> {
     if (response.statusCode == 200) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Merci pour votre retour !'),
+          content: const Text('Merci pour votre retour !'),
           backgroundColor: ColorUtils.success));
     } else {
       setState(() {
@@ -83,7 +90,7 @@ class _VerificationSheetState extends State<VerificationSheet> {
                   return Column(
                     children: [
                       Text(verif.id, style: FontUtils.title),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(children: [
                         FutureBuilder(
                           future: verif.getImageUrl(),
@@ -110,16 +117,16 @@ class _VerificationSheetState extends State<VerificationSheet> {
                             }
                           },
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Text(
                             "Modifier les valeur pour qu'elles\ncorrespondent à celle de la pièce.",
                             style: FontUtils.content),
                       ]),
-                      Divider(height: 16),
+                      const Divider(height: 16),
                       Text('Quelle est le côté ?', style: FontUtils.header),
                       RadioListTile<CoinSide>(
                         title: const Text('Pile'),
-                        value: CoinSide.REVERSE,
+                        value: CoinSide.reverse,
                         activeColor: ColorUtils.gold,
                         groupValue: verif.side,
                         onChanged: (CoinSide? value) {
@@ -132,7 +139,7 @@ class _VerificationSheetState extends State<VerificationSheet> {
                       ),
                       RadioListTile<CoinSide>(
                         title: const Text('Face'),
-                        value: CoinSide.OBVERSE,
+                        value: CoinSide.obverse,
                         activeColor: ColorUtils.gold,
                         groupValue: verif.side,
                         onChanged: (CoinSide? value) {
@@ -231,16 +238,16 @@ class _VerificationSheetState extends State<VerificationSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Finalisation', style: FontUtils.title),
-                    SizedBox(height: 64),
+                    const SizedBox(height: 64),
                     _errorMessage != ""
                         ? Text(_errorMessage, style: FontUtils.contentDanger)
                         : Text(
                             'Je certifie que les données envoyées sont correctes.', style: FontUtils.content),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           primary: ColorUtils.success.withOpacity(_loading ? 0.5 : 1),
-                          minimumSize: Size(double.infinity, 48),
+                          minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           )),

@@ -6,6 +6,8 @@ import '../utils/font_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+/// page de profile de l'utilisateur, très limité pour le moment
+/// l'utilisateur a juste la possibilité de se déconnecter
 class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key, required this.camera}) : super(key: key);
 
@@ -20,22 +22,35 @@ class ProfilePage extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Center(
             child: Column(children: [
-          Text('Bienvenue'),
-          SizedBox(width: 5),
+          const Text('Bienvenue'),
+          const SizedBox(width: 5),
           Text(user!.displayName.toString(), style: FontUtils.title),
           ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  primary: ColorUtils.danger,
-                  minimumSize: Size(double.infinity, 36),
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(8.0),
+                  primary: ColorUtils.blue,
+                  minimumSize: const Size(double.infinity, 36),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   )),
               onPressed: () {
                 Authentication.logout();
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => SignIn(camera: camera)));
               },
-              child: const Text("Se déconnecter"))
+              child: const Text("Se déconnecter")),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: ColorUtils.danger,
+                      minimumSize: const Size(double.infinity, 36),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      )),
+                  onPressed: () {
+                    Authentication.deleteAccount();
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => SignIn(camera: camera)));
+                  },
+                  child: const Text("Supprimer son compte"))
         ])));
   }
 }

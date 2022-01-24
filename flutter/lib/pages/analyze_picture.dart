@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_juste_coin/components/tag.dart';
 import 'package:le_juste_coin/components/verification_sheet.dart';
 import 'package:le_juste_coin/models/analyze_exception.dart';
-import 'package:le_juste_coin/models/verification.dart';
-import 'package:le_juste_coin/pages/gallery.dart';
 import '../models/analyze.dart';
 import '../pages/full_image.dart';
 import '../utils/color_utils.dart';
@@ -17,22 +14,26 @@ import 'package:flutter/material.dart';
 
 class AnalyzePicture extends StatefulWidget {
   final String imagePath;
-  final Function setAnalyzes;
+  final Function refreshAnalyzes;
 
   const AnalyzePicture(
-      {Key? key, required this.imagePath, required this.setAnalyzes})
+      {Key? key, required this.imagePath, required this.refreshAnalyzes})
       : super(key: key);
 
   @override
   _AnalyzePictureState createState() => _AnalyzePictureState();
 }
 
-class _AnalyzePictureState extends State<AnalyzePicture>
-    with SingleTickerProviderStateMixin {
+/// page pour envoyer une photo à l'API et la vérifier
+class _AnalyzePictureState extends State<AnalyzePicture> with SingleTickerProviderStateMixin {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  var _analyze;
+  bool _isLoading = false;
 
+  /// analyse qui sera récupérer une fois que l'utilisateur l'aura envoyé
+  Analyze? _analyze;
+
+  /// envoie l'image à l'API et retourne l'analyse désérialisé
   Future<Analyze> _getAnalyzeOfImage() async {
     String predictionEndpoint = dotenv.env['API_URL']! + '/analyse';
 
@@ -59,19 +60,29 @@ class _AnalyzePictureState extends State<AnalyzePicture>
     }
   }
 
+  /// envoie l'image à l'API et met à jour les analyses, sinon renvoie une erreur
   Future<void> _sendForPrediction(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       Analyze analyze = await _getAnalyzeOfImage();
 
-      widget.setAnalyzes();
+      widget.refreshAnalyzes();
 
       setState(() {
         _analyze = analyze;
+        _isLoading = false;
       });
     } catch (exception) {
       Color bgColor = exception is AnalyzeException
           ? ColorUtils.warning
           : ColorUtils.danger;
+
+      setState(() {
+        _isLoading = false;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(exception.toString()), backgroundColor: bgColor));
@@ -90,6 +101,7 @@ class _AnalyzePictureState extends State<AnalyzePicture>
             : bad;
   }
 
+  /// ouvre la fenêtre modal pour vérifier le détail de l'analyse
   void _verifyAnalyze(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -99,18 +111,19 @@ class _AnalyzePictureState extends State<AnalyzePicture>
               topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
         ),
         builder: (context) {
-          return VerificationSheet(analyze: _analyze);
+          return VerificationSheet(analyze: _analyze!);
         });
   }
 
+  /// affichage du résultat de l'analyse
   Widget _displayAnalyze(BuildContext context) {
-    return ListView(padding: EdgeInsets.all(12), children: [
+    return ListView(padding: const EdgeInsets.all(12), children: [
       Align(
           alignment: Alignment.topLeft,
           child: SizedBox(
               height: MediaQuery.of(context).size.height / 2,
               child: FutureBuilder(
-                future: _analyze.getImagesInOrder(),
+                future: _analyze!.getImagesInOrder(),
                 builder: (BuildContext context,
                     AsyncSnapshot<Map<String, String>> images) {
                   if (images.hasData) {
@@ -158,18 +171,18 @@ class _AnalyzePictureState extends State<AnalyzePicture>
                 },
               ))),
       const SizedBox(height: 8),
-      Text('${_analyze.id} - ${_analyze.getFullDateFormatted()}',
+      Text('${_analyze!.id} - ${_analyze!.getFullDateFormatted()}',
           style: FontUtils.content),
       const SizedBox(height: 8),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(_analyze.getFormattedCoinsInEuros(), style: FontUtils.title),
+        Text(_analyze!.getFormattedCoinsInEuros(), style: FontUtils.title),
         Tag(
-            content: '${_analyze.averageConfidence}%',
-            color: _getColorOnConfidence(_analyze.averageConfidence))
+            content: '${_analyze!.averageConfidence}%',
+            color: _getColorOnConfidence(_analyze!.averageConfidence))
       ]),
       const SizedBox(height: 24),
       Text('Détails des analyses', style: FontUtils.header),
-      ..._analyze.items
+      ..._analyze!.items
           .map(
             (AnalyzedItem item) => Container(
                 padding: const EdgeInsets.all(8),
@@ -220,7 +233,7 @@ class _AnalyzePictureState extends State<AnalyzePicture>
       ElevatedButton(
         style: ElevatedButton.styleFrom(
             primary: ColorUtils.success,
-            minimumSize: Size(double.infinity, 36),
+            minimumSize: const Size(double.infinity, 36),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             )),
@@ -232,7 +245,7 @@ class _AnalyzePictureState extends State<AnalyzePicture>
       ElevatedButton(
         style: ElevatedButton.styleFrom(
             primary: ColorUtils.blue,
-            minimumSize: Size(double.infinity, 36),
+            minimumSize: const Size(double.infinity, 36),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             )),
@@ -244,42 +257,42 @@ class _AnalyzePictureState extends State<AnalyzePicture>
     ]);
   }
 
+  /// affichage d'attente de l'utilisateur
   Widget _displayWaitingForAnalyze(BuildContext context) {
-    return ListView(padding: EdgeInsets.all(12), children: [
+    return ListView(padding: const EdgeInsets.all(12), children: [
       Align(
         alignment: Alignment.topLeft,
-        child: Container(
+        child: SizedBox(
             height: MediaQuery.of(context).size.height / 2,
-            child: Container(
-                child: ListView(scrollDirection: Axis.horizontal, children: [
+            child: ListView(scrollDirection: Axis.horizontal, children: [
               GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FullImage(imagePath: widget.imagePath);
-                  }));
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: Image.file(File(widget.imagePath)),
-                ),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FullImage(imagePath: widget.imagePath);
+              }));
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: Image.file(File(widget.imagePath)),
+            ),
               ),
               Center(
-                  child: Text('Les images traitées vont appaîtres ici',
-                      style: FontUtils.content))
-            ]))),
+              child: Text('Les images traitées vont appaîtres ici',
+                  style: FontUtils.content))
+            ])),
       ),
-      SizedBox(height: 8),
+      const SizedBox(height: 8),
       ElevatedButton(
         style: ElevatedButton.styleFrom(
             primary: ColorUtils.blue,
-            minimumSize: Size(double.infinity, 36),
+            minimumSize: const Size(double.infinity, 36),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             )),
-        onPressed: () {
+        onPressed: _isLoading ? null : () {
           _sendForPrediction(context);
         },
-        child: const Text("Démarrer"),
+        child: Text(_isLoading ? "Analyse..." : "Démarrer"),
       ),
     ]);
   }

@@ -15,13 +15,18 @@ class Register extends StatefulWidget {
   _RegisterState createState() => _RegisterState();
 }
 
+/// page de création de compte d'un utilisateur, accessible seulement
+/// si l'utilisateur n'est pas connecté
 class _RegisterState extends State<Register> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
+  // controllers des champs
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  /// enregistre l'utilisateur sur firebase et l'amène sur le contenu
+  /// de l'application
   void registerUser(BuildContext context) async {
     var authResponse = await Authentication.registerUsingEmailPassword(
       name: nameController.value.text,
@@ -45,7 +50,7 @@ class _RegisterState extends State<Register> {
                 child: Center(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
                       Text('Inscription', style: FontUtils.title),
-                      SizedBox(height: 32),
+                      const SizedBox(height: 32),
                       Form(
                         key: formkey,
                         child: Column(
@@ -60,7 +65,7 @@ class _RegisterState extends State<Register> {
                               controller: nameController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Prénom'),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             TextFormField(
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -72,7 +77,7 @@ class _RegisterState extends State<Register> {
                               controller: emailController,
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Adresse mail'),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             TextFormField(
                               obscureText: true,
                               validator: (value) {
@@ -86,13 +91,13 @@ class _RegisterState extends State<Register> {
                               decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Mot de passe'),
                               //validatePassword,        //Function to check validation
                             ),
-                            SizedBox(height: 32),
+                            const SizedBox(height: 32),
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: ColorUtils.blue,
-                                    minimumSize: Size(double.infinity, 36),
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(8.0),
+                                    minimumSize: const Size(double.infinity, 36),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
                                     )),
                                 onPressed: () {
                                   if (formkey.currentState!.validate()) {
@@ -103,9 +108,9 @@ class _RegisterState extends State<Register> {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: ColorUtils.gray,
-                                    minimumSize: Size(double.infinity, 36),
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(8.0),
+                                    minimumSize: const Size(double.infinity, 36),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
                                     )),
                                 onPressed: () {
                                   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn(camera: widget.camera)));

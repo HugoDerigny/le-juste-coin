@@ -3,25 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import './analyze_picture.dart';
 
-// A screen that allows users to take a picture using a given camera.
 class TakePicture extends StatefulWidget {
   final CameraDescription camera;
-  final Function setAnalyzes;
+  final Function refreshAnalyzes;
 
   const TakePicture({
     Key? key,
     required this.camera,
-    required this.setAnalyzes
+    required this.refreshAnalyzes
   }) : super(key: key);
 
   @override
   TakePictureState createState() => TakePictureState();
 }
 
+/// page qui utilise la caméra pour prendre en photo les pièces,
+/// une fois la photo prise cela amène sur la page [analyse_picture.dart]
 class TakePictureState extends State<TakePicture> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
+  FlashMode _flashMode = FlashMode.off;
+
+  /// initialise la caméra à la meilleure résolution
   @override
   void initState() {
     super.initState();
@@ -29,6 +33,8 @@ class TakePictureState extends State<TakePicture> {
       widget.camera,
       ResolutionPreset.max,
     );
+
+    _controller.setFlashMode(_flashMode);
 
     _initializeControllerFuture = _controller.initialize();
   }
@@ -43,7 +49,7 @@ class TakePictureState extends State<TakePicture> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compter mes pièces'),
+        title: const Text('Compter mes pièces'),
         backgroundColor: ColorUtils.pureBlack,
       ),
       body: Stack(alignment: FractionalOffset.center, children: [
@@ -75,28 +81,41 @@ class TakePictureState extends State<TakePicture> {
         )
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterFloat,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: ColorUtils.gold,
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
+      floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        FloatingActionButton(
+          backgroundColor: ColorUtils.white,
+          onPressed: () async {
+            setState(() {
+              _flashMode = _flashMode == FlashMode.off ? FlashMode.torch : FlashMode.off;
+            });
+            _controller.setFlashMode(_flashMode);
+          },
+          child: Icon(_flashMode == FlashMode.off ? Icons.flash_off : Icons.flash_on, color: ColorUtils.gold),
+        ),
+        SizedBox(width: 8),
+        FloatingActionButton(
+          backgroundColor: ColorUtils.gold,
+          onPressed: () async {
+            try {
+              await _initializeControllerFuture;
 
-            final image = await _controller.takePicture();
+              final image = await _controller.takePicture();
 
-            Navigator.pop(context);
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => AnalyzePicture(
-                  imagePath: image.path, setAnalyzes: widget.setAnalyzes
+              Navigator.pop(context);
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AnalyzePicture(
+                      imagePath: image.path, refreshAnalyzes: widget.refreshAnalyzes
+                  ),
                 ),
-              ),
-            );
-          } catch (e) {
-            print(e);
-          }
-        },
-        child: const Icon(Icons.camera),
-      ),
+              );
+            } catch (e) {
+              print(e);
+            }
+          },
+          child: const Icon(Icons.camera),
+        ),
+      ])
     );
   }
 }

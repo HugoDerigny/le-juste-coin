@@ -5,13 +5,15 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+// lancement de l'application
 Future<void> main() async {
+  // chargement des variables d'environnement depuis le fichier .env à la racine
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  // on récupère la caméra
   final cameras = await availableCameras();
   final firstCamera = cameras.first;
 

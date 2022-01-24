@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// classe d'authentification firebase
 class Authentication {
+  /// notre utilisateur
   static User? user;
 
+  /// inscrit un utilisateur via firebase, ou renvoie une erreur
   static Future<dynamic> registerUsingEmailPassword({
     required String name,
     required String email,
@@ -37,6 +40,7 @@ class Authentication {
     return user;
   }
 
+  /// connecte un utilisateur avec le couple email/mot de passe
   static Future<dynamic> signInUsingEmailPassword({
     required String email,
     required String password,
@@ -65,22 +69,13 @@ class Authentication {
     return user;
   }
 
+  /// déconnecte l'utilisateur
   static void logout() {
     FirebaseAuth.instance.signOut();
   }
 
-  static Future<User?> refreshUser() async {
-    await user!.reload();
-  }
-
-  static bool isUserAuthentified() {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-
-    if (currentUser != null) {
-      user = currentUser;
-      return true;
-    }
-
-    return false;
+  /// supprime le compte de l'utilisateur
+  static void deleteAccount() {
+    FirebaseAuth.instance.currentUser!.delete();
   }
 }

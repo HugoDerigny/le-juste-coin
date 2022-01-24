@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:le_juste_coin/utils/color_utils.dart';
 
+/// affiche une image en grand
 class FullImage extends StatelessWidget {
   const FullImage({Key? key, this.title = '', required this.imagePath})
       : super(key: key);
@@ -12,6 +12,8 @@ class FullImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// affichage différent s'il s'agit d'une image locale ou d'une image avec un
+    /// lien
     bool _isUrl = Uri.parse(imagePath).isAbsolute;
 
     return Scaffold(
@@ -27,7 +29,7 @@ class FullImage extends StatelessWidget {
         child: Center(
             child: InteractiveViewer(
                 panEnabled: false,
-                boundaryMargin: EdgeInsets.all(100),
+                boundaryMargin: const EdgeInsets.all(100),
                 minScale: 0.25,
                 maxScale: 2.5,
                 child: _isUrl

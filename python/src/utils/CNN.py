@@ -24,9 +24,9 @@ TMP_PATH = os.path.join(ROOT_PATH, 'tmp')
 
 def create_dataset():
     # initialize the number of epochs to train for, initial learning rate, batch size, and image dimensions
-    EPOCHS = 250
+    EPOCHS = 200
     INIT_LR = 0.001
-    BS = 16
+    BS = 128
     IMAGE_DIMS = (96, 96, 3)
 
     data = []
@@ -85,10 +85,10 @@ def create_dataset():
 
     # save the results to disk
     print("[INFO] serializing network...")
-    model.save(os.path.join(ROOT_PATH, "dataset_5k.h5"))
+    model.save(os.path.join(ROOT_PATH, "dataset.h5"))
 
     print("[INFO] serializing label binarizer...")
-    f = open(os.path.join(ROOT_PATH, "lab_5k.pickle"), "wb")
+    f = open(os.path.join(ROOT_PATH, "lab.pickle"), "wb")
     f.write(pickle.dumps(lb))
     f.close()
 
@@ -104,7 +104,7 @@ def create_dataset():
     plt.xlabel("Epoch #")
     plt.ylabel("Loss/Accuracy")
     plt.legend(loc="upper left")
-    plt.savefig(TMP_PATH + '/train_new_by_64.png')
+    plt.savefig(TMP_PATH + '/new.png')
     return
 
 
@@ -135,5 +135,5 @@ def classify(image, model, lb):
 
         return coin_value, proba[idx] * 100, output
 
-    except Exception as e:
+    except Exception:
         return None

@@ -4,6 +4,10 @@ import sqlite3
 
 
 def __getconn__():
+    """
+    renvoie la connexion à la DB locale SQLITE
+    :return:
+    """
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     conn = sqlite3.connect(os.path.join(dir_path, 'db.db'))
@@ -13,6 +17,12 @@ def __getconn__():
 
 
 def CreateAnalyse(uuid, token):
+    """
+    ajoute une analyse pour un utilisateur
+    :param uuid:
+    :param token:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     now = datetime.datetime.now()
@@ -31,6 +41,14 @@ def CreateAnalyse(uuid, token):
 
 
 def AddItemsToAnalyse(uuid, index, cents, confidence):
+    """
+    ajoute un détail d'analyse à une analyse
+    :param uuid:
+    :param index:
+    :param cents:
+    :param confidence:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     try:
@@ -46,6 +64,11 @@ def AddItemsToAnalyse(uuid, index, cents, confidence):
         return False
 
 def GetAnalysesOfUser(token=''):
+    """
+    renvoie les analyses d'un utilisateur
+    :param token:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     try:
@@ -64,6 +87,12 @@ def GetAnalysesOfUser(token=''):
 
 
 def UserOwnAnalyze(user_id, analyze_id):
+    """
+    renvoie true ou false selon si le user_id lié à l'analyse_id est le même que user_id passé en paramètre
+    :param user_id:
+    :param analyze_id:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     try:
@@ -78,6 +107,11 @@ def UserOwnAnalyze(user_id, analyze_id):
 
 
 def GetAnalyzeById(id):
+    """
+    renvoie une analyse selon son id
+    :param id:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     try:
@@ -91,6 +125,11 @@ def GetAnalyzeById(id):
 
 
 def RemoveUserAnalyse(id):
+    """
+    supprime les détails et l'analyse
+    :param id:
+    :return:
+    """
     (conn, cursor) = __getconn__()
 
     try:

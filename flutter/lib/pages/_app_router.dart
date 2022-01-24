@@ -1,18 +1,13 @@
 import 'dart:convert';
-import 'dart:ui';
-
 import 'package:camera/camera.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:le_juste_coin/models/analyze.dart';
-import '../models/authentication.dart';
 import '../pages/profile_page.dart';
-import '../pages/sign_in.dart';
 import '../pages/gallery.dart';
 import '../utils/color_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../pages/take_picture.dart';
-import '../pages/gallery.dart';
 import 'package:http/http.dart' as http;
 
 class AppRouter extends StatefulWidget {
@@ -24,16 +19,17 @@ class AppRouter extends StatefulWidget {
   _AppRouterState createState() => _AppRouterState();
 }
 
+/// router de l'application
 class _AppRouterState extends State<AppRouter> {
   int _selectedIndex = 0;
   late Future<List<Analyze>> _analyses;
 
-  final List<Widget> _pagesWidget = [];
+  /// index de nos pages
+  static const galleryPageIndex = 0;
+  static const cameraPageIndex = 1;
+  static const accountPageIndex = 2;
 
-  static const GALLERY_PAGE_INDEX = 0;
-  static const CAMERA_PAGE_INDEX = 1;
-  static const ACCOUNT_PAGE_INDEX = 2;
-
+  /// récupère et met dans l'état global les analyses de l'utilisateur
   Future<List<Analyze>> setUserAnalyzes() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     String analyzesEndpoint = dotenv.env['API_URL']! + '/analyse';
@@ -49,12 +45,14 @@ class _AppRouterState extends State<AppRouter> {
     }
   }
 
+  /// met à jour les analyses de l'utilisateur
   void refreshAnalyzes() {
     setState(() {
       _analyses = setUserAnalyzes();
     });
   }
 
+  /// à l'initialisation, récupère les analyses et déifinit les composants liés aux pages
   @override
   void initState() {
     super.initState();
@@ -62,16 +60,15 @@ class _AppRouterState extends State<AppRouter> {
     setState(() {
       _analyses = setUserAnalyzes();
     });
-
-    _pagesWidget.insert(GALLERY_PAGE_INDEX, Gallery(setAnalyzes: refreshAnalyzes, analyzes: _analyses));
-    _pagesWidget.insert(CAMERA_PAGE_INDEX, TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes));
-    _pagesWidget.insert(ACCOUNT_PAGE_INDEX, ProfilePage(camera: widget.camera));
   }
 
+  /// lorsqu'un onglet de la bottom navigation bar est tapé, cela met à jour l'index
+  /// sélectionné, ou bien s'il s'agit de la camera, le pousse dans une nouvelle
+  /// page
   void _onItemTapped(int index) {
-    if (index == CAMERA_PAGE_INDEX) {
+    if (index == cameraPageIndex) {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => _pagesWidget[CAMERA_PAGE_INDEX]),
+        MaterialPageRoute(builder: (context) => TakePicture(camera: widget.camera, refreshAnalyzes: refreshAnalyzes)),
       );
     } else {
       setState(() {
@@ -86,17 +83,17 @@ class _AppRouterState extends State<AppRouter> {
             body: SafeArea(
               child: (() {
                 switch(_selectedIndex) {
-                  case GALLERY_PAGE_INDEX:
+                  case galleryPageIndex:
                     return Gallery(setAnalyzes: refreshAnalyzes, analyzes: _analyses);
 
-                  case CAMERA_PAGE_INDEX:
-                    return TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes);
+                  case cameraPageIndex:
+                    return TakePicture(camera: widget.camera, refreshAnalyzes: refreshAnalyzes);
 
-                  case ACCOUNT_PAGE_INDEX:
+                  case accountPageIndex:
                     return ProfilePage(camera: widget.camera);
 
                   default:
-                    return TakePicture(camera: widget.camera, setAnalyzes: refreshAnalyzes);
+                    return TakePicture(camera: widget.camera, refreshAnalyzes: refreshAnalyzes);
                 }
               })()
             ),

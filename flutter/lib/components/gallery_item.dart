@@ -1,17 +1,19 @@
 import 'package:le_juste_coin/components/tag.dart';
 import 'package:le_juste_coin/utils/color_utils.dart';
-
 import '../components/item.dart';
 import '../models/analyze.dart';
 import '../utils/font_utils.dart';
 import 'package:flutter/material.dart';
 
+/// Carte d'une analyse affichée dans la gallerie.
+/// Il est possible de taper sur celle-ci pour afficher l'analyse dans une fenêtre modale du bas.
 class GalleryItem extends StatelessWidget {
   final Function refreshAnalyses;
   final Analyze analyze;
 
-  GalleryItem({Key? key, required this.analyze, required this.refreshAnalyses}) : super(key: key);
+  const GalleryItem({Key? key, required this.analyze, required this.refreshAnalyses}) : super(key: key);
 
+  /// Affiche l'analyse lors d'un tap sur la carte
   void openItem(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -24,6 +26,7 @@ class GalleryItem extends StatelessWidget {
         });
   }
 
+  /// Renvoie une couleur selon l'indice de confiance de l'analyse
   Color _getColorOnConfidence(int confidence) {
     Color ok = ColorUtils.success;
     Color average = ColorUtils.warning;
@@ -46,7 +49,7 @@ class GalleryItem extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
           child: FutureBuilder(
-            future: analyze.getImageUrl(ImageType.ORIGINAL),
+            future: analyze.getImageUrl(ImageType.original),
             builder: (BuildContext context, AsyncSnapshot<String> image) {
               if (image.hasData) {
                 return Image.network(image.data!, fit: BoxFit.cover, height: 128, width: double.infinity,

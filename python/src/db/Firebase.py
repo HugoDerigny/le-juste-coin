@@ -1,7 +1,5 @@
 import os.path
-
 from firebase_admin import credentials, initialize_app, storage
-
 import src.utils.ImageUtils as ImageUtils
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -12,6 +10,12 @@ bucket = storage.bucket()
 
 
 def SaveImage(image, name):
+    """
+    envoie une image sur firebase
+    :param image:
+    :param name:
+    :return:
+    """
     ImageUtils.WriteTmpImage(image, name)
 
     filename = name + '.jpg'
@@ -23,12 +27,23 @@ def SaveImage(image, name):
 
 
 def GetImage(image_name):
+    """
+    renvoie une image présente sur firebase
+    :param image_name:
+    :return:
+    """
     blob = bucket.get_blob(image_name)
 
     return blob
 
 
 def DownloadImage(image_name, path_to_save):
+    """
+    enregistre une image de firebase au chemin spécifié
+    :param image_name:
+    :param path_to_save:
+    :return:
+    """
     blob = bucket.get_blob(image_name)
     blob.download_to_filename(filename=path_to_save)
 
@@ -36,6 +51,11 @@ def DownloadImage(image_name, path_to_save):
 
 
 def RemoveImage(image_name):
+    """
+    supprime une image de firebase
+    :param image_name:
+    :return:
+    """
     bucket.delete_blob(image_name + '.jpg')
 
     return True

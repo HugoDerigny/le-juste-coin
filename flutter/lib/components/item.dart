@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:le_juste_coin/pages/full_image.dart';
@@ -21,9 +20,12 @@ class Item extends StatefulWidget {
   _ItemState createState() => _ItemState();
 }
 
+/// Détail de l'analyse affichée dans la fenêtre modale lorsque l'utilisateur
+/// tape sur une carte dans [gallery_item.dart]
 class _ItemState extends State<Item> {
   bool _isBeingRemoved = false;
 
+  /// Renvoie une couleur selon l'indice de confiance de l'analyse
   Color _getColorOnConfidence(int confidence) {
     Color ok = ColorUtils.success;
     Color average = ColorUtils.warning;
@@ -36,6 +38,9 @@ class _ItemState extends State<Item> {
             : bad;
   }
 
+  /// Envoie une requête à l'API pour supprimer une analyse.
+  /// S'il y a succès alors la fenêtre se ferme.
+  /// Sinon un message d'erreur apparaît.
   Future<void> _removeAnalyze(BuildContext context) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -74,7 +79,7 @@ class _ItemState extends State<Item> {
         padding: const EdgeInsets.all(16),
         child: ListView(children: [
           FutureBuilder(
-            future: analyze.getImageUrl(ImageType.ORIGINAL),
+            future: analyze.getImageUrl(ImageType.original),
             builder: (BuildContext context, AsyncSnapshot<String> image) {
               if (image.hasData) {
                 return GestureDetector(
@@ -119,7 +124,7 @@ class _ItemState extends State<Item> {
             },
           ),
           const SizedBox(height: 4),
-          Container(
+          SizedBox(
               height: 96,
               child: FutureBuilder(
                 future: analyze.getImagesInOrder(),
@@ -154,12 +159,13 @@ class _ItemState extends State<Item> {
                                                       Widget child,
                                                       ImageChunkEvent?
                                                           loadingProgress) {
-                                            if (loadingProgress == null)
+                                            if (loadingProgress == null) {
                                               return child;
+                                            }
                                             return Container(
                                                 height: 96,
                                                 margin:
-                                                    EdgeInsets.only(right: 4),
+                                                    const EdgeInsets.only(right: 4),
                                                 color: ColorUtils.gray,
                                                 width: 96,
                                                 child: Center(
@@ -186,7 +192,7 @@ class _ItemState extends State<Item> {
                               child: Container(
                                   height: 96,
                                   width: 96,
-                                  margin: EdgeInsets.only(right: 4),
+                                  margin: const EdgeInsets.only(right: 4),
                                   color: ColorUtils.gray,
                                   child: Center(
                                       child: CircularProgressIndicator(
@@ -269,23 +275,18 @@ class _ItemState extends State<Item> {
             onPressed: () {},
             child: const Text("Refaire l'analyse"),
           ),
-          ElevatedButton.icon(
-            icon: _isBeingRemoved
-                ? CircularProgressIndicator()
-                : Icon(Icons.delete_forever_outlined, color: ColorUtils.danger),
+          ElevatedButton(
             style: ElevatedButton.styleFrom(
-                primary: ColorUtils.white,
+                primary: ColorUtils.danger,
                 textStyle: FontUtils.header,
-                side: BorderSide(width: 2, color: ColorUtils.danger),
                 minimumSize: const Size(double.infinity, 36),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 )),
-            onPressed: () async {
+            onPressed: _isBeingRemoved ? null : () async {
               _removeAnalyze(context);
             },
-            label:
-                Text("Supprimer", style: TextStyle(color: ColorUtils.danger)),
+            child: Text(_isBeingRemoved ? "Suppression..." : "Supprimer", style: TextStyle(color: ColorUtils.white)),
           ),
         ]));
   }

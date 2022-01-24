@@ -15,12 +15,16 @@ class SignIn extends StatefulWidget {
   _SignInState createState() => _SignInState();
 }
 
+/// page d'authentification de l'utilisateur
 class _SignInState extends State<SignIn> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
-  TextEditingController emailController = TextEditingController(text: 'hugo.derigny@free.fr');
-  TextEditingController passwordController = TextEditingController(text: 'azertyui');
+  // controlleurs des champs
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
+  /// authentifie un utilisateur via firebase et l'envoie sur la page
+  /// du contenu principal
   void loginUser(BuildContext context) async {
     var authResponse = await Authentication.signInUsingEmailPassword(
       email: emailController.value.text,
@@ -28,9 +32,11 @@ class _SignInState extends State<SignIn> {
     );
 
     if (authResponse is String) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(authResponse), backgroundColor: ColorUtils.danger));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(authResponse), backgroundColor: ColorUtils.danger));
     } else {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AppRouter(camera: widget.camera)));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => AppRouter(camera: widget.camera)));
     }
   }
 
@@ -41,9 +47,12 @@ class _SignInState extends State<SignIn> {
             child: Container(
                 padding: const EdgeInsets.all(12),
                 child: Center(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                       Text('Connexion', style: FontUtils.title),
-                      SizedBox(height: 32),
+                      const SizedBox(height: 32),
                       Form(
                         key: formkey,
                         child: Column(
@@ -57,9 +66,11 @@ class _SignInState extends State<SignIn> {
                               },
                               autocorrect: false,
                               controller: emailController,
-                              decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Adresse mail'),
+                              decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Adresse mail'),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             TextFormField(
                               obscureText: true,
                               validator: (value) {
@@ -70,16 +81,19 @@ class _SignInState extends State<SignIn> {
                               },
                               autocorrect: false,
                               controller: passwordController,
-                              decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Mot de passe'),
+                              decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Mot de passe'),
                               //validatePassword,        //Function to check validation
                             ),
-                            SizedBox(height: 32),
+                            const SizedBox(height: 32),
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: ColorUtils.blue,
-                                    minimumSize: Size(double.infinity, 36),
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(8.0),
+                                    minimumSize:
+                                        const Size(double.infinity, 36),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
                                     )),
                                 onPressed: () {
                                   if (formkey.currentState!.validate()) {
@@ -90,17 +104,27 @@ class _SignInState extends State<SignIn> {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: ColorUtils.gray,
-                                    minimumSize: Size(double.infinity, 36),
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(8.0),
+                                    minimumSize:
+                                        const Size(double.infinity, 36),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
                                     )),
                                 onPressed: () {
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Register(camera: widget.camera)));
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              Register(camera: widget.camera)));
                                 },
-                                child: const Text("S'inscrire", style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))))
+                                child: const Text("S'inscrire",
+                                    style: TextStyle(
+                                        color: Color.fromARGB(255, 0, 0, 0))))
                           ],
                         ),
                       ),
-                    ])))));
+                    ])
+                )
+            )
+        )
+    );
   }
 }

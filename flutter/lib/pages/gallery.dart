@@ -4,10 +4,13 @@ import '../models/analyze.dart';
 import '../utils/font_utils.dart';
 import 'package:flutter/material.dart';
 
+/// gallerie qui liste toutes les analyses
 class Gallery extends StatefulWidget {
   final Function setAnalyzes;
   final Future<List<Analyze>> analyzes;
 
+  /// Tous les filtres avec un label pour l'utilisateur et la méthode
+  /// de tri qui sera directement utilisée
   static final filters = {
     "DATE_DESC": {
       "label": "Le plus récent",
@@ -47,7 +50,7 @@ class Gallery extends StatefulWidget {
     }
   };
 
-  Gallery({Key? key, required this.setAnalyzes, required this.analyzes})
+  const Gallery({Key? key, required this.setAnalyzes, required this.analyzes})
       : super(key: key);
 
   @override
@@ -55,12 +58,13 @@ class Gallery extends StatefulWidget {
 }
 
 class _GalleryState extends State<Gallery> {
+  /// on trie par défaut sur les analyses les plus récentes
   String _activeFilter = "DATE_DESC";
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -69,7 +73,7 @@ class _GalleryState extends State<Gallery> {
             Row(
               children: [
                 Text('Trier par', style: FontUtils.content),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 DropdownButton(
                   value: _activeFilter,
                   items: [
@@ -91,7 +95,7 @@ class _GalleryState extends State<Gallery> {
               future: widget.analyzes,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  if (snapshot.data!.length > 0) {
+                  if (snapshot.data!.isNotEmpty) {
 
                     snapshot.data!.sort((a, b) {
                       Map<String, dynamic> filter = Gallery.filters[_activeFilter]!;
@@ -102,7 +106,7 @@ class _GalleryState extends State<Gallery> {
                     return Expanded(
                         child: RefreshIndicator(
                             child: GridView.count(
-                              padding: EdgeInsets.only(top: 16),
+                              padding: const EdgeInsets.only(top: 16),
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,
                               crossAxisCount: 2,
@@ -120,17 +124,17 @@ class _GalleryState extends State<Gallery> {
                             }));
                   } else {
                     return Container(
-                        margin: EdgeInsets.only(top: 32),
+                        margin: const EdgeInsets.only(top: 32),
                         child: Center(
                             child: Column(children: [
                               Text('Prenez une photo pour faire une analyse.',
                                   style: FontUtils.content),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               ElevatedButton(
                                 onPressed: () {
                                   widget.setAnalyzes();
                                 },
-                                child: Text('Rafraîchir'),
+                                child: const Text('Rafraîchir'),
                                 style: ElevatedButton.styleFrom(
                                     primary: ColorUtils.gold,
                                     shape: RoundedRectangleBorder(
@@ -141,18 +145,18 @@ class _GalleryState extends State<Gallery> {
                   }
                 } else if (snapshot.hasError) {
                   return Column(children: [
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     Text('Une erreur est survenue: ${snapshot.error}',
                         style: FontUtils.contentDanger),
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: () {
                         widget.setAnalyzes();
                       },
-                      child: Text('Rafraîchir'),
+                      child: const Text('Rafraîchir'),
                       style: ElevatedButton.styleFrom(
                           primary: ColorUtils.danger,
-                          minimumSize: Size(double.infinity, 36),
+                          minimumSize: const Size(double.infinity, 36),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           )),

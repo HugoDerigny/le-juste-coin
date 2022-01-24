@@ -1,5 +1,4 @@
 import datetime
-import json
 import locale
 import os
 from collections import defaultdict
@@ -18,6 +17,12 @@ data_dir_path = os.path.join(dir_path, '../..', 'data')
 
 
 def __parseanalyzes__(analyzes_dto):
+    """
+    Transforme les analyses sorties de la base de données en JSON pour l'API, et ajoute les champs de confiance moyenne
+    et somme en centimes.
+    :param analyzes_dto:  Analyse provenant de la BDD
+    :return: Objet JSON de l'analyse
+    """
     user_analyses = []
 
     d = defaultdict(list)
@@ -60,7 +65,14 @@ def __parseanalyzes__(analyzes_dto):
 
     return user_analyses
 
+
 def DefineImages(images, directory):
+    """
+    Cette méthode est utilisée pour enregistrer des nouvelles images dans le dataset
+    :param images:
+    :param directory:
+    :return:
+    """
     for image_name in images:
         crop_img = cv2.imread(os.path.join(data_dir_path, directory, image_name))
         cv2.imshow('Define', crop_img)
@@ -82,17 +94,31 @@ def DefineImages(images, directory):
 
 
 def ProceedToAnalyse(image, token=''):
+    """
+    Prend l'image venant de la requête, détecte les cercles et utilise le modèle de machine learning pour trouver
+    les pièces. Renvoie le JSON du résultat de l'analyse.
+    :param image: Image Flask de la requête
+    :param token: ID utilisateur
+    :return: None | dict
+    """
+
+    # Conversion de l'image flask vers OpenCV, étape nécessaire pour les traitements
     image = ImageUtils.ConvertFlaskImageToOpenCV(image)
 
+    # On effectue différents traitements sur l'image
     (resized_image, blured_image, eroded_image, dilated_image, edges_image) = ImageUtils.ProcessImage(image)
 
+    # on génère un id unique sur 6 chiffres
     uuid = (str(uuid4())[0:6]).upper()
 
+    # le machine learning analyse l'image et renvoie un résultat
     result = AI.AnalyzeImage(resized_image, edges_image, uuid, token)
 
+    # s'il n'y en a pas c'est car aucun cercle n'a été trouvé
     if result is None:
         return
 
+    # toutes les variations d'images sont enregistrées sur firebase pour que l'utilisateur y ait accès
     Firebase.SaveImage(resized_image, f'#{uuid}-original')
     Firebase.SaveImage(blured_image, f'#{uuid}-blur')
     Firebase.SaveImage(eroded_image, f'#{uuid}-erode')
@@ -113,12 +139,25 @@ def ProceedToAnalyse(image, token=''):
 
 
 def FetchUserAnalyses(token):
+    """
+    récupère les analyses de l'utilisateur selon son ID et les renvoie
+    :param token:
+    :return:
+    """
     user_analyses_dto = Database.GetAnalysesOfUser(token)
 
     return __parseanalyzes__(user_analyses_dto)
 
 
 def DeleteUserAnalyze(user_id, analyze_id):
+    """
+    supprime l'analyse de la BDD locale ainsi que les images sur Firebase
+    :param user_id:
+    :param analyze_id:
+    :return:
+    """
+
+    # on vérifie que l'ID de l'utilisateur correspond à celui enregistré pour l'analyse
     if not Database.UserOwnAnalyze(user_id, analyze_id):
         return 'Not enough permission', 403
 
